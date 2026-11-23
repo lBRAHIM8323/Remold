@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="#4F46E5"/>
+  <!-- the original: a square -->
+  <rect x="44" y="44" width="76" height="76" rx="12" fill="none" stroke="#FFFFFF" stroke-width="14"/>
+  <!-- the remolded file: a circle -->
+  <circle cx="174" cy="174" r="40" fill="#FFFFFF"/>
+  <!-- the arrow between them -->
+  <path d="M150 70 C 196 70, 206 96, 206 112" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round"/>
+  <path d="M188 104 L 206 128 L 224 104" fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

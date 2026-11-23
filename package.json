@@ -1,0 +1,232 @@
+{
+  "name": "remold",
+  "displayName": "Remold",
+  "description": "Convert images right from the Explorer: Convert to ▸ WEBP, AVIF, PNG, JPG, ICO and more, see output sizes first, update references, and insert dropped or pasted images as WebP. Offline.",
+  "version": "0.1.0",
+  "publisher": "lBRAHIM8323",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "vscode": "^1.97.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "image",
+    "convert",
+    "webp",
+    "avif",
+    "heic",
+    "png",
+    "jpg"
+  ],
+  "main": "./dist/extension.js",
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": false
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "remold.to.png",
+        "title": "PNG",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.jpg",
+        "title": "JPG",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.webp",
+        "title": "WEBP",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.avif",
+        "title": "AVIF",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.gif",
+        "title": "GIF",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.ico",
+        "title": "ICO",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.moreFormats",
+        "title": "More Formats…",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.convertTo",
+        "title": "Convert Image…",
+        "category": "Remold",
+        "icon": "$(arrow-swap)"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "submenu": "remold.convertSubmenu",
+          "when": "resourceScheme == file && resourceExtname =~ /^\\.(png|jpe?g|jfif|webp|gif|bmp|tiff?|avif|hei[cf]|ico|jxl|tga|qoi|psd|jp2|dds|exr|hdr|ppm|pcx|dng|cr2)$/i",
+          "group": "7_modification@9"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "submenu": "remold.convertSubmenu",
+          "when": "resourceScheme == file && resourceExtname =~ /^\\.(png|jpe?g|jfif|webp|gif|bmp|tiff?|avif|hei[cf]|ico|jxl|tga|qoi|psd|jp2|dds|exr|hdr|ppm|pcx|dng|cr2)$/i",
+          "group": "7_modification@9"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "remold.convertTo",
+          "when": "activeCustomEditorId == imagePreview.previewEditor && resourceScheme == file && resourceExtname =~ /^\\.(png|jpe?g|jfif|webp|gif|bmp|tiff?|avif|hei[cf]|ico|jxl|tga|qoi|psd|jp2|dds|exr|hdr|ppm|pcx|dng|cr2)$/i",
+          "group": "navigation"
+        }
+      ],
+      "remold.convertSubmenu": [
+        {
+          "command": "remold.to.png",
+          "when": "resourceExtname =~ /^(?!\\.png$)/i",
+          "group": "1_common@0"
+        },
+        {
+          "command": "remold.to.jpg",
+          "when": "resourceExtname =~ /^(?!\\.(jpe?g|jfif)$)/i",
+          "group": "1_common@1"
+        },
+        {
+          "command": "remold.to.webp",
+          "when": "resourceExtname =~ /^(?!\\.webp$)/i",
+          "group": "1_common@2"
+        },
+        {
+          "command": "remold.to.avif",
+          "when": "resourceExtname =~ /^(?!\\.avif$)/i",
+          "group": "1_common@3"
+        },
+        {
+          "command": "remold.to.gif",
+          "when": "resourceExtname =~ /^(?!\\.gif$)/i",
+          "group": "1_common@4"
+        },
+        {
+          "command": "remold.to.ico",
+          "when": "resourceExtname =~ /^(?!\\.ico$)/i",
+          "group": "1_common@5"
+        },
+        {
+          "command": "remold.moreFormats",
+          "group": "2_more@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "remold.to.png",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.jpg",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.webp",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.avif",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.gif",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.ico",
+          "when": "false"
+        },
+        {
+          "command": "remold.moreFormats",
+          "when": "false"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Remold",
+      "properties": {
+        "remold.quality": {
+          "type": "integer",
+          "default": 85,
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Quality (1–100) for lossy formats: JPG, WEBP, AVIF, JPEG XL and JPEG 2000."
+        },
+        "remold.outputFolder": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Folder for converted files, relative to each source file's folder (for example `converted`) or absolute. Empty puts them next to the source file. Existing files are never replaced; a number is added to the name instead."
+        },
+        "remold.estimateSizes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the size each format would have in the format picker. Measuring converts the image once per format in the background."
+        },
+        "remold.insertFormat": {
+          "type": "string",
+          "default": "webp",
+          "enum": [
+            "png",
+            "jpg",
+            "webp",
+            "avif",
+            "gif",
+            "jxl"
+          ],
+          "markdownDescription": "Format used by **Insert as … (Remold)** when dropping or pasting images into Markdown or HTML."
+        },
+        "remold.referenceFiles": {
+          "type": "string",
+          "default": "**/*.{html,htm,css,scss,sass,less,md,mdx,js,jsx,ts,tsx,vue,svelte,astro}",
+          "markdownDescription": "Files searched for references to a converted image (glob). Empty turns off **Update References**. `node_modules`, `.git`, `dist`, `build` and `out` are always skipped."
+        }
+      }
+    },
+    "submenus": [
+      {
+        "id": "remold.convertSubmenu",
+        "label": "Convert to"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "node esbuild.mjs && node esbuild.mjs --tests && node --test \"out-test/*.test.js\"",
+    "package": "node esbuild.mjs --production && vsce package --no-dependencies",
+    "vscode:prepublish": "node esbuild.mjs --production",
+    "test:integration": "node esbuild.mjs && node esbuild.mjs --tests && node out-test/integration/run.js"
+  },
+  "dependencies": {
+    "@imagemagick/magick-wasm": "^0.0.46"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/vscode": "1.97.0",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^4.1.1",
+    "esbuild": "^0.28.2",
+    "typescript": "^7.0.2"
+  },
+  "icon": "media/icon.png"
+}
