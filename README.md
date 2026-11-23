@@ -6,6 +6,11 @@ Filee converts (images, PDF, Word/Excel/PowerPoint and OpenDocument files, HWP, 
 subtitles, data, maps, fonts, CAD drawings, 3D models — 300+ formats), Remold converts. Files never leave your
 computer.
 
+> **Powered by [Filee](https://filee.sh)** by Myeonggu Kim ([KnifeLemon](https://github.com/KnifeLemon)) and
+> [Filee contributors](https://github.com/KnifeLemon/Filee/graphs/contributors). All conversions are Filee's work;
+> Remold adds the VS Code side. If Remold is useful to you, please ⭐
+> [Filee on GitHub](https://github.com/KnifeLemon/Filee) too.
+
 ## Setup
 
 Nothing to install by hand. On first start Remold uses your own [Filee](https://filee.sh) if you have 2.5 or later;
@@ -73,6 +78,16 @@ node scripts/sync-menus.mjs # after changing the quick targets in src/filee/quic
 ```
 
 Press <kbd>F5</kbd> in VS Code to start a development window with the extension loaded.
+
+## Credits
+
+- **[Filee](https://github.com/KnifeLemon/Filee)** — the converter behind every conversion in Remold, by Myeonggu
+  Kim (KnifeLemon) and Filee contributors, MIT license. Remold runs Filee's command line, unchanged, from Filee's
+  official releases. Remold is an independent project, not made or endorsed by the Filee authors. Bugs in a
+  conversion's result belong in [Filee's issues](https://github.com/KnifeLemon/Filee/issues); bugs in menus,
+  setup or anything else in VS Code belong here.
+- The engines Filee uses (ImageMagick, LibreOffice, FFmpeg, Pandoc, 7-Zip and others) are credited in
+  [Filee's third-party notices](https://github.com/KnifeLemon/Filee/blob/main/THIRD-PARTY-NOTICES.md).
 
 ## License
 

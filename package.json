@@ -1,7 +1,7 @@
 {
   "name": "remold",
   "displayName": "Remold",
-  "description": "Convert any file Filee can (images, documents, PDF, video, audio, archives, e-books, fonts and more) from VS Code: Convert to ▸ in the Explorer, every format under More Formats…, update references, insert images as WebP.",
+  "description": "Convert any file from VS Code, powered by Filee (filee.sh): images, documents, PDF, video, audio, archives, e-books, fonts and 300+ formats. Convert to ▸ in the Explorer, update references, insert images as WebP.",
   "version": "0.1.0",
   "publisher": "lBRAHIM8323",
   "license": "MIT",

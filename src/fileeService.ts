@@ -169,7 +169,7 @@ export class FileeService implements vscode.Disposable {
             }
             installed = await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
-                title: 'Remold: setting up Filee, the converter (one-time download)',
+                title: 'Remold: setting up Filee (filee.sh), the converter behind Remold — one-time download',
                 cancellable: true,
             }, async (progress, token) => {
                 const abort = new AbortController();
@@ -193,6 +193,7 @@ export class FileeService implements vscode.Disposable {
             if (!installed)
                 return undefined;
             this.log.appendLine(`Installed Filee ${installed.version} at ${installed.program}`);
+            vscode.window.setStatusBarMessage(`$(check) Remold is ready: conversions by Filee ${installed.version} (filee.sh)`, 15000);
             await this.context.globalState.update(LAST_UPDATE_CHECK, Date.now());
         }
         const cli = new FileeCli(installed.program, this.managed.environment());
@@ -206,6 +207,7 @@ export class FileeService implements vscode.Disposable {
         const catalog = await vscode.window.withProgress(
             { location: vscode.ProgressLocation.Window, title: 'Remold: reading Filee\'s formats' },
             () => Catalog.load(cli, path.join(storage, 'catalog.json')));
+        this.log.appendLine(`Converting with Filee ${catalog.version} by Myeonggu Kim (KnifeLemon) and Filee contributors, https://filee.sh`);
         this.log.appendLine(`Filee ${catalog.version} at ${program}: ${catalog.formats.length} formats (${Date.now() - started} ms)`);
         return catalog;
     }
