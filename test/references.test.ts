@@ -4,7 +4,8 @@ import * as path from 'node:path';
 import { test } from 'node:test';
 import { findReferences } from '../src/references';
 
-const root = path.join(path.sep, 'repo');
+// path.resolve gives a real absolute path on every platform (with a drive letter on Windows).
+const root = path.resolve('/repo');
 const source = path.join(root, 'public', 'img', 'cat.png');
 const docInImg = path.join(root, 'public', 'img', 'page.md');
 const docInSrc = path.join(root, 'src', 'components', 'Hero.tsx');

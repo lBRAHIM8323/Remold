@@ -38,6 +38,10 @@ export function findReferences(text: string, documentPath: string, sourcePath: s
     return found;
 }
 
+/** Windows paths are compared without regard to case, as Windows does. */
+const same = (a: string, b: string) => process.platform === 'win32' ? a.toLowerCase() === b.toLowerCase() : a === b;
+const endsWith = (a: string, b: string) => process.platform === 'win32' ? a.toLowerCase().endsWith(b.toLowerCase()) : a.endsWith(b);
+
 function refersTo(token: string, documentPath: string, source: string, roots: readonly string[]): boolean {
     if (/^[a-z][a-z0-9+.-]*:\/\//i.test(token) || token.startsWith('data:'))
         return false;
@@ -49,9 +53,9 @@ function refersTo(token: string, documentPath: string, source: string, roots: re
     }
     if (ALIAS.test(decoded) || decoded.startsWith('/')) {
         const tail = path.normalize('/' + decoded.replace(ALIAS, ''));
-        return source.endsWith(tail);
+        return endsWith(source, tail);
     }
-    if (path.resolve(path.dirname(documentPath), decoded) === source)
+    if (same(path.resolve(path.dirname(documentPath), decoded), source))
         return true;
-    return roots.some(root => path.resolve(root, decoded) === source);
+    return roots.some(root => same(path.resolve(root, decoded), source));
 }

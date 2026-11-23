@@ -10,8 +10,8 @@ export function managedRoot(platform: NodeJS.Platform = process.platform, env: N
     if (platform === 'win32')
         return path.win32.join(env.LOCALAPPDATA ?? path.win32.join(home, 'AppData', 'Local'), 'Remold');
     if (platform === 'darwin')
-        return path.join(home, 'Library', 'Application Support', 'Remold');
-    return path.join(env.XDG_DATA_HOME || path.join(home, '.local', 'share'), 'remold');
+        return path.posix.join(home, 'Library', 'Application Support', 'Remold');
+    return path.posix.join(env.XDG_DATA_HOME || path.posix.join(home, '.local', 'share'), 'remold');
 }
 
 const REGISTRY = 'users.json';

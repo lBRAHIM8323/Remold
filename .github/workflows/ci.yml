@@ -22,6 +22,15 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      # FFmpeg for the video tests: Filee uses the one on PATH.
+      - name: Install FFmpeg
+        shell: bash
+        run: |
+          case "$RUNNER_OS" in
+            Linux) sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg ;;
+            macOS) brew install ffmpeg ;;
+            Windows) choco install ffmpeg -y --no-progress ;;
+          esac
       - run: npm ci
       - run: npm run typecheck
       - run: npm test

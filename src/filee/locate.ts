@@ -23,12 +23,13 @@ export function candidatePaths(platform: NodeJS.Platform = process.platform, env
             ...onPath.map(dir => path.win32.join(dir, 'filee-cli.exe')),
         ];
     }
+    const posix = path.posix;
     return [
-        ...onPath.map(dir => path.join(dir, 'filee')),
-        path.join(home, '.local', 'bin', 'filee'),
+        ...onPath.map(dir => posix.join(dir, 'filee')),
+        posix.join(home, '.local', 'bin', 'filee'),
         ...(platform === 'darwin'
-            ? [path.join(home, 'Applications', 'Filee.app', 'Contents', 'MacOS', 'filee-cli'), '/Applications/Filee.app/Contents/MacOS/filee-cli']
-            : [path.join(home, '.local', 'share', 'filee', 'application', 'filee-cli')]),
+            ? [posix.join(home, 'Applications', 'Filee.app', 'Contents', 'MacOS', 'filee-cli'), '/Applications/Filee.app/Contents/MacOS/filee-cli']
+            : [posix.join(home, '.local', 'share', 'filee', 'application', 'filee-cli')]),
     ];
 }
 
