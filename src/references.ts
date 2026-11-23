@@ -52,7 +52,8 @@ function refersTo(token: string, documentPath: string, source: string, roots: re
         decoded = token;
     }
     if (ALIAS.test(decoded) || decoded.startsWith('/')) {
-        const tail = path.normalize('/' + decoded.replace(ALIAS, ''));
+        // One separator in front ("//x" would be a network path on Windows), so "/img/cat.png" can't match ".../bigimg/cat.png".
+        const tail = path.sep + path.normalize(decoded.replace(ALIAS, '').replace(/^[\\/]+/, ''));
         return endsWith(source, tail);
     }
     if (same(path.resolve(path.dirname(documentPath), decoded), source))
