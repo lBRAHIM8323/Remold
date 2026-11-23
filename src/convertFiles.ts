@@ -9,6 +9,7 @@ import { Converted, referenceEdit } from './updateReferences';
 
 export async function convertFiles(filee: Filee, files: readonly string[], target: string, log: vscode.OutputChannel): Promise<void> {
     const targetName = filee.catalog.format(target)?.name ?? target.toUpperCase();
+    await filee.catalog.ensureTargets(files);
     const convertible = files.filter(f => filee.catalog.commonTargets([f]).includes(target));
     if (convertible.length < files.length) {
         const skipped = files.filter(f => !convertible.includes(f)).map(f => path.basename(f));
@@ -84,8 +85,15 @@ export async function convertFiles(filee: Filee, files: readonly string[], targe
         const message = converted.length === 0 && failed.length === 1
             ? `Couldn't convert ${path.basename(failed[0].source)}: ${failed[0].error ?? 'Filee reported an error.'}`
             : `Converted ${converted.length} of ${convertible.length} files to ${targetName}; ${failed.length} failed.`;
+        // A missing engine (LibreOffice, Calibre, …) is something the user can fix from here.
+        const engine = failed.some(f => /engine|libreoffice|calibre|tesseract|ghostscript|pandoc|ffmpeg|install/i.test(f.error ?? ''));
         // Not awaited: the command finishes now, and the message waits for the user on its own.
-        void vscode.window.showWarningMessage(message, 'Show Log').then(choice => { if (choice === 'Show Log') log.show(); });
+        void vscode.window.showWarningMessage(message, ...(engine ? ['Install Engines…'] : []), 'Show Log').then(choice => {
+            if (choice === 'Show Log')
+                log.show();
+            else if (choice === 'Install Engines…')
+                void vscode.commands.executeCommand('remold.installEngines');
+        });
         if (converted.length === 0)
             return;
     }

@@ -282,6 +282,16 @@
         "command": "remold.updateFilee",
         "title": "Check for Filee Updates",
         "category": "Remold"
+      },
+      {
+        "command": "remold.setupFilee",
+        "title": "Set Up Filee…",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.installEngines",
+        "title": "Install Filee Engines…",
+        "category": "Remold"
       }
     ],
     "menus": {
@@ -539,7 +549,13 @@
         },
         {
           "command": "remold.moreFormats",
+          "when": "remold.ready",
           "group": "2_more@1"
+        },
+        {
+          "command": "remold.setupFilee",
+          "when": "!remold.ready",
+          "group": "2_more@2"
         }
       ],
       "commandPalette": [
@@ -802,7 +818,8 @@
     "package": "node esbuild.mjs --production && vsce package --no-dependencies",
     "vscode:prepublish": "node esbuild.mjs --production",
     "test:integration": "node esbuild.mjs && node esbuild.mjs --tests && node out-test/integration/run.js",
-    "parity": "esbuild scripts/verify-parity.ts --bundle --platform=node --format=cjs --outfile=out-test/verify-parity.js --log-level=warning && node out-test/verify-parity.js"
+    "parity": "esbuild scripts/verify-parity.ts --bundle --platform=node --format=cjs --outfile=out-test/verify-parity.js --log-level=warning && node out-test/verify-parity.js",
+    "vscode:uninstall": "node ./dist/uninstall.js"
   },
   "devDependencies": {
     "@imagemagick/magick-wasm": "^0.0.46",
@@ -816,5 +833,20 @@
   "icon": "media/icon.png",
   "activationEvents": [
     "onStartupFinished"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lBRAHIM8323/Remold.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lBRAHIM8323/Remold/issues"
+  },
+  "homepage": "https://github.com/lBRAHIM8323/Remold#readme",
+  "extensionKind": [
+    "workspace"
+  ],
+  "galleryBanner": {
+    "color": "#4F46E5",
+    "theme": "dark"
+  }
 }

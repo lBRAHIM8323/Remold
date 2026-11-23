@@ -3,6 +3,7 @@
 // reference updates after converting, and "Insert as WEBP" when dropping or pasting images.
 import * as vscode from 'vscode';
 import { convertFiles } from './convertFiles';
+import { installEngines } from './engines';
 import { FileeService } from './fileeService';
 import { QUICK_TARGET_IDS } from './filee/quick';
 import { registerInsertProviders } from './insert';
@@ -33,16 +34,32 @@ export function activate(context: vscode.ExtensionContext): void {
         const files = filee ? await chooseFiles(uri, uris) : [];
         if (!filee || files.length === 0)
             return;
-        const target = await pickTarget(filee, files);
-        if (target)
-            await convertFiles(filee, files, target, log);
+        const picked = await pickTarget(filee, files);
+        if (!picked)
+            return;
+        if (picked.needsEngine) {
+            const name = filee.catalog.format(picked.target)?.name ?? picked.target;
+            if (!(await installEngines(service, `${name} needs an optional Filee engine: pick the one to install`)))
+                return;
+            const reloaded = await service.get();
+            await reloaded?.catalog.ensureTargets(files);
+            if (!reloaded?.catalog.commonTargets(files).includes(picked.target)) {
+                void vscode.window.showWarningMessage(`${name} still isn't available; another engine may be needed (Remold: Install Filee Engines…).`);
+                return;
+            }
+            await convertFiles(reloaded, files, picked.target, log);
+            return;
+        }
+        await convertFiles(filee, files, picked.target, log);
     };
     context.subscriptions.push(
         vscode.commands.registerCommand('remold.convertTo', pickAndConvert),
         vscode.commands.registerCommand('remold.moreFormats', pickAndConvert),
         vscode.commands.registerCommand('remold.updateFilee', () => service.checkForUpdate(true)),
+        vscode.commands.registerCommand('remold.setupFilee', () => service.setUp()),
+        vscode.commands.registerCommand('remold.installEngines', () => installEngines(service)),
         vscode.commands.registerCommand('remold.reloadFilee', async () => {
-            const filee = await service.reload();
+            const filee = await service.reload({ fresh: true });
             if (filee)
                 void vscode.window.showInformationMessage(`Remold uses Filee ${filee.catalog.version}: ${filee.catalog.formats.length} formats.`);
             else

@@ -20,7 +20,7 @@ if (tests) {
     // Start from an empty dist/ so files from removed entry points never end up in the package.
     rmSync('dist', { recursive: true, force: true });
     mkdirSync('dist', { recursive: true });
-    const options = { ...common, entryPoints: { extension: 'src/extension.ts' }, outdir: 'dist', external: ['vscode'] };
+    const options = { ...common, entryPoints: { extension: 'src/extension.ts', uninstall: 'src/uninstall.ts' }, outdir: 'dist', external: ['vscode'] };
     if (watch)
         await (await context(options)).watch();
     else

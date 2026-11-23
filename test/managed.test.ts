@@ -12,6 +12,8 @@ import { after, before, test } from 'node:test';
 import { ManagedFilee } from '../src/filee/managed';
 import { fakeFilee } from './fakeFilee';
 
+// The fake packages hold a shell-script Filee; Windows is covered by the integration test with real Filee.
+const skip = process.platform === 'win32' && 'needs shell scripts';
 const keys = generateKeyPairSync('ec', { namedCurve: 'prime256v1' });
 const publicKey = keys.publicKey.export({ format: 'der', type: 'spki' }).toString('base64');
 const files = new Map<string, Buffer>();
@@ -67,7 +69,7 @@ function managed(versions: string[]): ManagedFilee {
     });
 }
 
-test('installs the newest supported release, checked and runnable', async () => {
+test('installs the newest supported release, checked and runnable', { skip }, async () => {
     publish('2.5.0');
     publish('2.6.0');
     publish('3.0.0');
@@ -83,7 +85,7 @@ test('installs the newest supported release, checked and runnable', async () => 
     assert.equal(filee.environment({}).FILEE_DATA_DIR, path.join(filee.root, 'data'));
 });
 
-test('a damaged download, a bad signature, a missing program or a wrong version is not installed', async () => {
+test('a damaged download, a bad signature, a missing program or a wrong version is not installed', { skip }, async () => {
     publish('2.7.0', { damage: true });
     publish('2.8.0', { badSignature: true });
     publish('2.9.0', { noProgram: true });
@@ -97,7 +99,7 @@ test('a damaged download, a bad signature, a missing program or a wrong version 
     assert.equal(filee.current(), undefined, 'nothing was installed');
 });
 
-test('an update replaces the old copy; a failed one keeps it', async () => {
+test('an update replaces the old copy; a failed one keeps it', { skip }, async () => {
     publish('2.5.0');
     publish('2.11.0', { damage: true });
     publish('2.12.0');
@@ -116,6 +118,13 @@ test('an update replaces the old copy; a failed one keeps it', async () => {
     await filee.install(next);
     assert.equal(filee.current()?.version, '2.12.0');
     assert.ok(!existsSync(path.join(filee.root, 'versions', '2.5.0')), 'the old copy is removed');
+});
+
+test('the download size comes from the release', { skip }, async () => {
+    publish('2.5.0');
+    const filee = managed(['2.5.0']);
+    const release = await filee.latest();
+    assert.equal(filee.downloadSize(release), files.get('/2.5.0/Filee-2.5.0-linux-x64.tar.gz')!.length);
 });
 
 test('a platform without packages is reported', () => {

@@ -79,6 +79,11 @@ export class ManagedFilee {
         return releases.sort((a, b) => compareVersions(b.version, a.version))[0];
     }
 
+    /** Bytes to download for `release` on this computer. */
+    downloadSize(release: Release): number | undefined {
+        return this.files(release)?.archive.size;
+    }
+
     /** A newer supported release than the one installed, or undefined. */
     async update(signal?: AbortSignal): Promise<Release | undefined> {
         const latest = await this.latest(signal);

@@ -1,12 +1,13 @@
 // Connects Remold to Filee: finds the Filee to use (the user's own, or a copy Remold downloads and keeps up to date),
 // loads what it can convert, sets the menus' context keys, and tells the user what to do when there's a problem.
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, rmSync } from 'node:fs';
 import * as path from 'node:path';
 import * as vscode from 'vscode';
 import { Catalog } from './filee/catalog';
 import { FileeCli, FileeVersionError } from './filee/cli';
 import { locateFilee } from './filee/locate';
 import { ManagedFilee } from './filee/managed';
+import { managedRoot, register } from './filee/paths';
 import { QUICK_TARGET_IDS, menuContext } from './filee/quick';
 import { MIN_VERSION, isSupportedVersion } from './filee/release';
 import { formatSize } from './sizes';
@@ -14,6 +15,8 @@ import { formatSize } from './sizes';
 const GET_FILEE = 'https://filee.sh';
 const UPDATE_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const LAST_UPDATE_CHECK = 'remold.lastFileeUpdateCheck';
+/** Set once the user has seen the "set up Filee" offer at startup, so it isn't shown on every start. */
+const SETUP_OFFERED = 'remold.setupOffered';
 
 export interface Filee {
     readonly cli: FileeCli;
@@ -32,7 +35,7 @@ export class FileeService implements vscode.Disposable {
     private updating = false;
 
     constructor(private readonly context: vscode.ExtensionContext, private readonly log: vscode.OutputChannel) {
-        this.managed = new ManagedFilee(path.join(context.globalStorageUri.fsPath, 'filee'));
+        this.managed = new ManagedFilee(managedRoot());
         this.subscriptions.push(vscode.workspace.onDidChangeConfiguration(e => {
             if (e.affectsConfiguration('remold.fileePath') || e.affectsConfiguration('remold.fileeSource'))
                 void this.reload();
@@ -52,7 +55,12 @@ export class FileeService implements vscode.Disposable {
      * instead of nothing happening until it's ready.
      */
     get(options: { quiet?: boolean } = {}): Promise<Filee | undefined> {
-        this.loading ??= this.load();
+        // Something the user asked for may set Filee up (after asking); a quiet load never downloads.
+        if (!options.quiet && this.needsSetup) {
+            this.needsSetup = false;
+            this.loading = this.load(true);
+        }
+        this.loading ??= this.load(false);
         let settled = false;
         void this.loading.finally(() => { settled = true; });
         const waiting = options.quiet ? this.loading : Promise.resolve().then(() => settled ? this.loading! : vscode.window.withProgress(
@@ -65,11 +73,36 @@ export class FileeService implements vscode.Disposable {
         });
     }
 
-    /** Loads Filee again, after the load in progress (if any) has finished, so two loads never download at once. */
-    reload(): Promise<Filee | undefined> {
+    /**
+     * Loads Filee again, after the load in progress (if any) has finished, so two loads never download at once.
+     * `fresh` reads Filee's formats again even if they're cached (after installing an engine, say).
+     */
+    reload(options: { fresh?: boolean; allowDownload?: boolean } = {}): Promise<Filee | undefined> {
         const previous = this.loading ?? Promise.resolve(undefined);
-        this.loading = previous.catch(() => undefined).then(() => this.load());
+        this.loading = previous.catch(() => undefined).then(() => {
+            if (options.fresh)
+                rmSync(this.catalogCache, { force: true });
+            return this.load(options.allowDownload ?? false);
+        });
         return this.get({ quiet: true });
+    }
+
+    /** Set up Filee now (the "Set Up Filee" command and buttons). */
+    setUp(): Promise<Filee | undefined> {
+        return this.reload({ allowDownload: true }).then(filee => {
+            if (!filee)
+                void this.explainProblem();
+            return filee;
+        });
+    }
+
+    /** True when the last load found no Filee and didn't download one, because nobody asked yet. */
+    private needsSetup = false;
+    /** True when the user just answered "Not Now" to the download: nothing more to say. */
+    private declined = false;
+
+    private get catalogCache(): string {
+        return path.join(this.context.globalStorageUri.fsPath, 'catalog.json');
     }
 
     /**
@@ -109,7 +142,7 @@ export class FileeService implements vscode.Disposable {
         }
     }
 
-    private async load(): Promise<Filee | undefined> {
+    private async load(allowDownload: boolean): Promise<Filee | undefined> {
         const config = vscode.workspace.getConfiguration('remold');
         const source = config.get<Source>('fileeSource', 'auto');
         const configured = config.get<string>('fileePath', '').trim();
@@ -121,7 +154,7 @@ export class FileeService implements vscode.Disposable {
                 filee = await this.useInstalled(locateFilee(undefined), 'Filee isn\'t installed (remold.fileeSource is "installed").', true);
             else if (source === 'auto')
                 filee = await this.useInstalled(locateFilee(undefined), undefined, false);
-            filee ??= configured || source === 'installed' ? undefined : await this.useManaged();
+            filee ??= configured || source === 'installed' ? undefined : await this.useManaged(allowDownload);
             await this.setMenus(filee?.catalog);
             if (filee) {
                 this.problem = undefined;
@@ -159,12 +192,21 @@ export class FileeService implements vscode.Disposable {
         return { cli, catalog: await this.loadCatalog(cli, program), source: 'installed' };
     }
 
-    /** Remold's own copy, downloading it the first time. */
-    private async useManaged(): Promise<Filee | undefined> {
+    /** Remold's own copy. The first time, it's downloaded only with `allowDownload` and the user's OK. */
+    private async useManaged(allowDownload: boolean): Promise<Filee | undefined> {
         let installed = this.managed.current();
         if (!installed) {
             if (!this.managed.supported) {
                 this.problem = `Filee has no download for ${process.platform} ${process.arch}. Install Filee yourself and set remold.fileePath.`;
+                return undefined;
+            }
+            this.declined = false;
+            if (!allowDownload || !(await this.askToDownload())) {
+                this.needsSetup = true;
+                this.declined = allowDownload;
+                this.problem = 'Remold converts files with Filee, which isn\'t set up yet.';
+                if (!allowDownload)
+                    void this.offerSetupOnce();
                 return undefined;
             }
             installed = await vscode.window.withProgress({
@@ -196,8 +238,38 @@ export class FileeService implements vscode.Disposable {
             vscode.window.setStatusBarMessage(`$(check) Remold is ready: conversions by Filee ${installed.version} (filee.sh)`, 15000);
             await this.context.globalState.update(LAST_UPDATE_CHECK, Date.now());
         }
+        register(this.managed.root, this.context.extensionPath);
         const cli = new FileeCli(installed.program, this.managed.environment());
         return { cli, catalog: await this.loadCatalog(cli, installed.program), source: 'managed' };
+    }
+
+    /** Asks before downloading Filee; the size comes from the release. */
+    private async askToDownload(): Promise<boolean> {
+        // Integration tests can't click buttons; their run sets this to stand for "Download Filee".
+        if (process.env.REMOLD_TEST_MODE === 'managed')
+            return true;
+        let size = '';
+        try {
+            const release = await this.managed.latest();
+            const bytes = this.managed.downloadSize(release);
+            size = bytes ? ` (${formatSize(bytes)})` : '';
+        } catch { /* offline: the download below will say so */ }
+        const choice = await vscode.window.showInformationMessage(
+            `Remold converts files with Filee (filee.sh). Download it now${size}? It's a one-time download, checked against Filee's signature, kept up to date by Remold.`,
+            'Download Filee', 'Not Now');
+        return choice === 'Download Filee';
+    }
+
+    /** At startup, mentions once that Filee needs setting up, without downloading anything. */
+    private async offerSetupOnce(): Promise<void> {
+        if (this.context.globalState.get<boolean>(SETUP_OFFERED))
+            return;
+        await this.context.globalState.update(SETUP_OFFERED, true);
+        const choice = await vscode.window.showInformationMessage(
+            'Remold is installed. It converts files with Filee (filee.sh), which it downloads once when you first convert something.',
+            'Set Up Now', 'Later');
+        if (choice === 'Set Up Now')
+            await this.setUp();
     }
 
     private async loadCatalog(cli: FileeCli, program: string): Promise<Catalog> {
@@ -206,7 +278,15 @@ export class FileeService implements vscode.Disposable {
         const started = Date.now();
         const catalog = await vscode.window.withProgress(
             { location: vscode.ProgressLocation.Window, title: 'Remold: reading Filee\'s formats' },
-            () => Catalog.load(cli, path.join(storage, 'catalog.json')));
+            () => Catalog.load(cli, this.catalogCache));
+        if (!catalog.isComplete) {
+            // The menus work now; they're set again once every format's targets are read.
+            const reading = vscode.window.setStatusBarMessage('$(sync~spin) Remold: reading Filee\'s formats');
+            void catalog.complete.then(() => this.setMenus(catalog)).finally(() => {
+                reading.dispose();
+                this.log.appendLine(`Read every format's targets (${Date.now() - started} ms)`);
+            });
+        }
         this.log.appendLine(`Converting with Filee ${catalog.version} by Myeonggu Kim (KnifeLemon) and Filee contributors, https://filee.sh`);
         this.log.appendLine(`Filee ${catalog.version} at ${program}: ${catalog.formats.length} formats (${Date.now() - started} ms)`);
         return catalog;
@@ -215,12 +295,19 @@ export class FileeService implements vscode.Disposable {
     private async setMenus(catalog: Catalog | undefined): Promise<void> {
         const menus = catalog ? menuContext(catalog) : undefined;
         await vscode.commands.executeCommand('setContext', 'remold.ready', !!catalog);
+        await vscode.commands.executeCommand('setContext', 'remold.needsSetup', !catalog && this.needsSetup);
         await vscode.commands.executeCommand('setContext', 'remold.supported', menus?.supported ?? []);
         for (const id of QUICK_TARGET_IDS)
             await vscode.commands.executeCommand('setContext', `remold.quick.${id}`, menus?.quick[id] ?? []);
     }
 
     private async explainProblem(): Promise<void> {
+        if (this.needsSetup) {
+            // Nothing is wrong: Filee just isn't set up yet. Ask, unless the user just said "Not Now".
+            if (!this.declined)
+                await this.setUp();
+            return;
+        }
         const choice = await vscode.window.showErrorMessage(this.problem ?? 'Remold needs Filee to convert files.', 'Try Again', 'Settings', 'About Filee');
         if (choice === 'About Filee')
             await vscode.env.openExternal(vscode.Uri.parse(GET_FILEE));

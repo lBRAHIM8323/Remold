@@ -25,6 +25,17 @@ test('package.json matches src/filee/quick.ts (run node scripts/sync-menus.mjs a
     assert.equal(commands.filter((c: { command: string }) => c.command.startsWith('remold.to.')).length, QUICK_TARGET_IDS.length);
 });
 
+test('before Filee is ready the submenu offers setting it up', () => {
+    const items = menus['remold.convertSubmenu'];
+    assert.equal(items.find((i: { command: string }) => i.command === 'remold.setupFilee')?.when, '!remold.ready');
+    assert.equal(items.find((i: { command: string }) => i.command === 'remold.moreFormats')?.when, 'remold.ready');
+});
+
+test('uninstalling removes Remold\'s Filee', () => {
+    assert.equal(manifest.scripts['vscode:uninstall'], 'node ./dist/uninstall.js');
+    assert.ok(manifest.repository?.url.includes('lBRAHIM8323/Remold'));
+});
+
 test('every command in a menu is declared', () => {
     const declared = new Set(commands.map((c: { command: string }) => c.command));
     for (const entries of Object.values(menus) as { command?: string }[][])

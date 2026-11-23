@@ -11,13 +11,15 @@ export async function run(): Promise<void> {
         ['commands are registered', async () => {
             await vscode.extensions.getExtension('lbrahim8323.remold')!.activate();
             const commands = await vscode.commands.getCommands(true);
-            for (const id of ['remold.to.pdf', 'remold.to.webp', 'remold.to.mp4', 'remold.to.folder', 'remold.moreFormats', 'remold.convertTo', 'remold.reloadFilee'])
+            for (const id of ['remold.to.pdf', 'remold.to.webp', 'remold.to.mp4', 'remold.to.folder', 'remold.moreFormats', 'remold.convertTo', 'remold.reloadFilee', 'remold.setupFilee', 'remold.installEngines'])
                 assert.ok(commands.includes(id), id);
         }],
         ['Filee is ready (downloaded first when managed) and its formats load', async () => {
             // The first start downloads Filee when managed, and reads every format's targets (cached afterwards).
             const started = Date.now();
-            await vscode.commands.executeCommand('remold.reloadFilee');
+            // "Set Up Filee" downloads Filee when managed (the test run answers the download question), or loads the
+            // configured one.
+            await vscode.commands.executeCommand('remold.setupFilee');
             console.log(`    loaded in ${Date.now() - started} ms`);
         }],
         ['image: Convert to ▸ WEBP writes the file next to the original', async () => {

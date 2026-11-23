@@ -18,7 +18,9 @@ contributes.commands = [
 contributes.menus['remold.convertSubmenu'] = [
     // Each target shows only for files Filee can convert to it (context keys set from Filee's formats at startup).
     ...QUICK_TARGET_IDS.map((id, n) => ({ command: `remold.to.${id}`, when: `resourceExtname in remold.quick.${id}`, group: `1_quick@${n}` })),
-    { command: 'remold.moreFormats', group: '2_more@1' },
+    { command: 'remold.moreFormats', when: 'remold.ready', group: '2_more@1' },
+    // Before Filee is set up the submenu offers just that.
+    { command: 'remold.setupFilee', when: '!remold.ready', group: '2_more@2' },
 ];
 contributes.menus.commandPalette = [
     ...QUICK_TARGET_IDS.map(id => ({ command: `remold.to.${id}`, when: 'false' })),

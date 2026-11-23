@@ -21,16 +21,22 @@ const CATEGORY_TITLES: Readonly<Record<string, string>> = {
 
 interface FormatItem extends vscode.QuickPickItem {
     readonly target?: string;
+    readonly needsEngine?: boolean;
 }
 
-export function pickTarget(filee: Filee, files: readonly string[]): Promise<string | undefined> {
+/** What the user picked: a target to convert to now, or one that first needs an optional engine. */
+export type Picked = { readonly target: string; readonly needsEngine: boolean };
+
+export async function pickTarget(filee: Filee, files: readonly string[]): Promise<Picked | undefined> {
     const { catalog } = filee;
+    await catalog.ensureTargets(files);
     const targets = catalog.commonTargets(files);
-    if (targets.length === 0) {
+    const withEngines = catalog.commonWithEngines(files);
+    if (targets.length === 0 && withEngines.length === 0) {
         void vscode.window.showWarningMessage(files.length === 1
             ? `Filee can't convert ${path.basename(files[0])}.`
             : 'Filee has no format all the selected files can be converted to. Select files of one kind.');
-        return Promise.resolve(undefined);
+        return undefined;
     }
     const source = files.length === 1 ? catalog.formatOf(files[0]) : undefined;
     const suggested = (source ? QUICK_TARGETS[source.category] ?? [] : []).filter(t => targets.includes(t));
@@ -41,7 +47,7 @@ export function pickTarget(filee: Filee, files: readonly string[]): Promise<stri
 
     const picker = vscode.window.createQuickPick<FormatItem>();
     picker.title = files.length === 1 ? `Convert ${path.basename(files[0])} to` : `Convert ${files.length} files to`;
-    picker.placeholder = `${targets.length} formats · type to filter`;
+    picker.placeholder = `${targets.length} formats${withEngines.length ? ` (+${withEngines.length} with an optional engine)` : ''} · type to filter`;
     picker.matchOnDescription = true;
 
     const item = (target: string): FormatItem => {
@@ -68,6 +74,13 @@ export function pickTarget(filee: Filee, files: readonly string[]): Promise<stri
         }
         for (const [category, list] of byCategory)
             items.push({ label: CATEGORY_TITLES[category] ?? category, kind: vscode.QuickPickItemKind.Separator }, ...list.map(item));
+        if (withEngines.length > 0)
+            items.push({ label: 'Needs an optional engine', kind: vscode.QuickPickItemKind.Separator },
+                ...withEngines.map(target => ({
+                    label: catalog.format(target)?.name ?? target,
+                    description: `.${catalog.format(target)?.extensions[0] ?? target} · install an engine first`,
+                    target, needsEngine: true,
+                })));
         return items;
     };
     picker.items = build();
@@ -76,7 +89,8 @@ export function pickTarget(filee: Filee, files: readonly string[]): Promise<stri
         let open = true;
         const abort = new AbortController();
         picker.onDidAccept(() => {
-            resolve(picker.selectedItems[0]?.target);
+            const chosen = picker.selectedItems[0];
+            resolve(chosen?.target ? { target: chosen.target, needsEngine: !!chosen.needsEngine } : undefined);
             picker.hide();
         });
         picker.onDidHide(() => {

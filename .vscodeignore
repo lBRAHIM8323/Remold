@@ -11,3 +11,6 @@ scripts/**
 media/icon.svg
 .vscode-test/**
 .parity/**
+.claude/**
+.github/**
+skills-lock.json

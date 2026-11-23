@@ -45,11 +45,27 @@ export interface ConvertOptions {
     readonly signal?: AbortSignal;
 }
 
+/** One optional engine from `filee engines --json` (LibreOffice, Pandoc, FFmpeg, Calibre, Tesseract, …). */
+export interface FileeEngine {
+    readonly id: string;
+    /** "installed", "owncopy" (the user's own or the system's), "notinstalled", … */
+    readonly status: string;
+    readonly downloadable?: boolean;
+    readonly downloadSize?: number;
+    /** Why Filee can't download it (install it with the system's package manager instead). */
+    readonly unavailableReason?: string;
+}
+
 /** Filee is installed but answers in a way Remold can't use: too old (no --json) or broken. */
 export class FileeVersionError extends Error {}
 
 export class FileeCli {
-    constructor(readonly program: string, private readonly env: NodeJS.ProcessEnv = process.env) {}
+    /**
+     * @param program Filee's command-line program.
+     * @param env The environment to run it with.
+     * @param prefix Arguments before every command (tests run a script through Node this way).
+     */
+    constructor(readonly program: string, private readonly env: NodeJS.ProcessEnv = process.env, private readonly prefix: readonly string[] = []) {}
 
     /** "2.5.0" from `filee version`. */
     async version(): Promise<string> {
@@ -66,6 +82,15 @@ export class FileeCli {
 
     async targets(formatId: string): Promise<FileeFormatTargets> {
         return this.json<FileeFormatTargets>(['formats', formatId, '--json']);
+    }
+
+    async engines(): Promise<FileeEngine[]> {
+        return (await this.json<{ engines: FileeEngine[] }>(['engines', '--json'])).engines;
+    }
+
+    /** Downloads and installs an optional engine with Filee's own download and checks. */
+    async installEngine(id: string, signal?: AbortSignal): Promise<void> {
+        await this.run(['engines', 'install', id, '--quiet'], { signal });
     }
 
     /**
@@ -105,7 +130,7 @@ export class FileeCli {
 
     private run(args: string[], options: { signal?: AbortSignal; onStderrLine?: (line: string) => void; okExitCodes?: number[] } = {}): Promise<{ stdout: string; stderr: string }> {
         return new Promise((resolve, reject) => {
-            const child = spawn(this.program, args, { env: this.env, signal: options.signal, windowsHide: true });
+            const child = spawn(this.program, [...this.prefix, ...args], { env: this.env, signal: options.signal, windowsHide: true });
             let stdout = '', stderr = '', pending = '';
             child.stdout.setEncoding('utf8').on('data', (chunk: string) => { stdout += chunk; });
             child.stderr.setEncoding('utf8').on('data', (chunk: string) => {

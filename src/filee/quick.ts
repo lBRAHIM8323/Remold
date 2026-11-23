@@ -49,8 +49,11 @@ export function menuContext(catalog: Catalog): MenuContext {
     const supported = new Set<string>();
     const quick: Record<string, Set<string>> = Object.fromEntries(QUICK_TARGET_IDS.map(id => [id, new Set<string>()]));
     for (const format of catalog.formats) {
-        const targets = catalog.targetsOf(format.id);
-        if (targets.length === 0)
+        // Until a format's targets are read, assume it reaches its category's quick targets; the command checks
+        // again before converting, and the menus are set again once every format is known.
+        const known = catalog.hasTargets(format.id);
+        const targets = known ? catalog.targetsOf(format.id) : QUICK_TARGETS[format.category] ?? [];
+        if (known && targets.length === 0)
             continue;
         // resourceExtname is the part after the last dot, so "tar.gz" shows as ".gz"; the submenu checks the full
         // name when it runs, and "More Formats…" is always right.

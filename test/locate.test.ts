@@ -23,13 +23,13 @@ test('Windows: the per-user and per-machine install, and the exe next to cli\\fi
     assert.ok(paths.includes('C:\\Tools\\Filee\\filee-cli.exe'));
 });
 
-test('a configured path is used only if it exists', () => {
+test('a configured path is used only if it exists', { skip: process.platform === 'win32' && 'POSIX paths' }, () => {
     const program = fakeFilee();
     assert.equal(locateFilee(program, 'linux', { PATH: '' }, '/nowhere'), program);
     assert.equal(locateFilee('/nonexistent/filee', 'linux', { PATH: '' }, '/nowhere'), undefined);
 });
 
-test('found on PATH', () => {
+test('found on PATH', { skip: process.platform === 'win32' && 'POSIX paths' }, () => {
     const program = fakeFilee();
     assert.equal(locateFilee(undefined, 'linux', { PATH: path.dirname(program) }, '/nowhere'), program);
 });
