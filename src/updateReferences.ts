@@ -1,11 +1,16 @@
 // Builds the workspace edit that updates references to converted images, shown in VS Code's Refactor Preview.
 import * as path from 'node:path';
 import * as vscode from 'vscode';
-import type { Converted } from './conversion';
 import { findReferences } from './references';
 
 /** Text files bigger than this are skipped: generated bundles, minified code. */
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
+
+/** A converted file: references to `source` become references to `output`. */
+export interface Converted {
+    readonly source: string;
+    readonly output: string;
+}
 
 export interface ReferenceEdit {
     readonly edit: vscode.WorkspaceEdit;

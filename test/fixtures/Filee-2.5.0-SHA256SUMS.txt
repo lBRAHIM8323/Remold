@@ -1,0 +1,4 @@
+08d7f5519f32e3d6635312745164d4cb18836010129108ce1a65e55bd7c781a5  Filee-2.5.0-win-Setup.exe
+a0e6c5f6b623f100c6ed6d4afae96f6efbee6c6e1ad790fe3e789fa4a9bfdf4f  Filee-2.5.0-win-Portable.zip
+fa4766e8353ed52027013662cd4fdfc663394b2ad9ddb789bdda3f63e9bf9ac0  Filee-2.5.0-win-arm64-Setup.exe
+d0ffbdf0e8c07838866dd5f13e8e4dfd9b94308c48edb6016f93a6c7744833fb  Filee-2.5.0-win-arm64-Portable.zip

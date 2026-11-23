@@ -1,45 +1,34 @@
-// Keeps package.json's menus in step with the formats and commands Remold has.
+// Keeps package.json's menus in step with the quick targets and commands.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
-import { INPUT_EXTENSIONS, TARGET_FORMATS } from '../src/formats';
+import { QUICK_TARGET_IDS, QUICK_TARGET_TITLES } from '../src/filee/quick';
 
 const manifest = JSON.parse(readFileSync('package.json', 'utf8'));
-const menus = manifest.contributes.menus;
-const regexIn = (when: string) => {
-    const match = /resourceExtname =~ \/(.+?)\/i/.exec(when)!;
-    return new RegExp(match[1], 'i');
-};
+const { commands, menus } = manifest.contributes;
 
-test('"Convert to" appears for every supported extension, in the Explorer and on editor tabs', () => {
+test('"Convert to" is in the Explorer and editor tab menus, for files Filee reads', () => {
     for (const menu of ['explorer/context', 'editor/title/context']) {
         const entry = menus[menu].find((m: { submenu?: string }) => m.submenu === 'remold.convertSubmenu');
-        assert.ok(entry, `${menu} has the submenu`);
-        const matcher = regexIn(entry.when);
-        for (const extension of INPUT_EXTENSIONS)
-            assert.ok(matcher.test(`.${extension}`), `.${extension} missing from ${menu}`);
-        assert.ok(!matcher.test('.txt'));
+        assert.ok(entry, menu);
+        assert.match(entry.when, /resourceExtname in remold\.supported/);
     }
 });
 
-test('every common format has a command in the submenu, hidden for its own format', () => {
-    const items = menus['remold.convertSubmenu'];
-    const sameFormat: Record<string, string[]> = { png: ['.png', '.PNG'], jpg: ['.jpg', '.jpeg', '.jfif'], webp: ['.webp'], avif: ['.avif'], gif: ['.gif'], ico: ['.ico'] };
-    for (const format of TARGET_FORMATS.filter(t => t.common)) {
-        const item = items.find((i: { command: string }) => i.command === `remold.to.${format.id}`);
-        assert.ok(item, `remold.to.${format.id} in the submenu`);
-        const shown = regexIn(item.when);
-        for (const own of sameFormat[format.id])
-            assert.ok(!shown.test(own), `${format.id} hidden for ${own}`);
-        assert.ok(shown.test('.tiff'), `${format.id} shown for .tiff`);
+test('package.json matches src/filee/quick.ts (run node scripts/sync-menus.mjs after changing it)', () => {
+    for (const id of QUICK_TARGET_IDS) {
+        const command = commands.find((c: { command: string }) => c.command === `remold.to.${id}`);
+        assert.equal(command?.title, QUICK_TARGET_TITLES[id], id);
+        const item = menus['remold.convertSubmenu'].find((i: { command: string }) => i.command === `remold.to.${id}`);
+        assert.equal(item?.when, `resourceExtname in remold.quick.${id}`);
     }
-    assert.ok(items.some((i: { command: string }) => i.command === 'remold.moreFormats'));
+    assert.equal(commands.filter((c: { command: string }) => c.command.startsWith('remold.to.')).length, QUICK_TARGET_IDS.length);
 });
 
 test('every command in a menu is declared', () => {
-    const declared = new Set(manifest.contributes.commands.map((c: { command: string }) => c.command));
+    const declared = new Set(commands.map((c: { command: string }) => c.command));
     for (const entries of Object.values(menus) as { command?: string }[][])
         for (const entry of entries)
             if (entry.command)
-                assert.ok(declared.has(entry.command), `${entry.command} is declared`);
+                assert.ok(declared.has(entry.command), entry.command);
 });

@@ -10,3 +10,4 @@ tsconfig.json
 scripts/**
 media/icon.svg
 .vscode-test/**
+.parity/**

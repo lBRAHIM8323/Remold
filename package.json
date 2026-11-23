@@ -1,7 +1,7 @@
 {
   "name": "remold",
   "displayName": "Remold",
-  "description": "Convert images right from the Explorer: Convert to ▸ WEBP, AVIF, PNG, JPG, ICO and more, see output sizes first, update references, and insert dropped or pasted images as WebP. Offline.",
+  "description": "Convert any file Filee can (images, documents, PDF, video, audio, archives, e-books, fonts and more) from VS Code: Convert to ▸ in the Explorer, every format under More Formats…, update references, insert images as WebP.",
   "version": "0.1.0",
   "publisher": "lBRAHIM8323",
   "license": "MIT",
@@ -13,13 +13,15 @@
     "Other"
   ],
   "keywords": [
-    "image",
     "convert",
+    "converter",
+    "image",
+    "pdf",
+    "docx",
+    "video",
+    "audio",
     "webp",
-    "avif",
-    "heic",
-    "png",
-    "jpg"
+    "filee"
   ],
   "main": "./dist/extension.js",
   "capabilities": {
@@ -61,69 +63,479 @@
         "category": "Remold"
       },
       {
+        "command": "remold.to.pdf",
+        "title": "PDF",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.svg",
+        "title": "SVG",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.docx",
+        "title": "DOCX",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.txt",
+        "title": "TXT",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.odt",
+        "title": "ODT",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.md",
+        "title": "Markdown",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.html",
+        "title": "HTML",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.xlsx",
+        "title": "XLSX",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.csv",
+        "title": "CSV",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.ods",
+        "title": "ODS",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.pptx",
+        "title": "PPTX",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.json",
+        "title": "JSON",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.yaml",
+        "title": "YAML",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.xml",
+        "title": "XML",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.epub",
+        "title": "EPUB",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.mobi",
+        "title": "MOBI",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.azw3",
+        "title": "AZW3",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.mp4",
+        "title": "MP4",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.webm",
+        "title": "WEBM",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.mp3",
+        "title": "MP3",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.wav",
+        "title": "WAV",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.flac",
+        "title": "FLAC",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.m4a",
+        "title": "M4A",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.ogg",
+        "title": "OGG",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.zip",
+        "title": "ZIP",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.7z",
+        "title": "7Z",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.folder",
+        "title": "Extract to Folder",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.dxf",
+        "title": "DXF",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.ttf",
+        "title": "TTF",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.otf",
+        "title": "OTF",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.woff2",
+        "title": "WOFF2",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.srt",
+        "title": "SRT",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.vtt",
+        "title": "VTT",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.ass",
+        "title": "ASS",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.geojson",
+        "title": "GeoJSON",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.gpx",
+        "title": "GPX",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.kml",
+        "title": "KML",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.glb",
+        "title": "GLB",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.stl",
+        "title": "STL",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.to.obj",
+        "title": "OBJ",
+        "category": "Remold"
+      },
+      {
         "command": "remold.moreFormats",
         "title": "More Formats…",
         "category": "Remold"
       },
       {
         "command": "remold.convertTo",
-        "title": "Convert Image…",
+        "title": "Convert File…",
         "category": "Remold",
         "icon": "$(arrow-swap)"
+      },
+      {
+        "command": "remold.reloadFilee",
+        "title": "Reload Filee Formats",
+        "category": "Remold"
+      },
+      {
+        "command": "remold.updateFilee",
+        "title": "Check for Filee Updates",
+        "category": "Remold"
       }
     ],
     "menus": {
       "explorer/context": [
         {
           "submenu": "remold.convertSubmenu",
-          "when": "resourceScheme == file && resourceExtname =~ /^\\.(png|jpe?g|jfif|webp|gif|bmp|tiff?|avif|hei[cf]|ico|jxl|tga|qoi|psd|jp2|dds|exr|hdr|ppm|pcx|dng|cr2)$/i",
+          "when": "!explorerResourceIsFolder && resourceScheme == file && (!remold.ready || resourceExtname in remold.supported)",
           "group": "7_modification@9"
         }
       ],
       "editor/title/context": [
         {
           "submenu": "remold.convertSubmenu",
-          "when": "resourceScheme == file && resourceExtname =~ /^\\.(png|jpe?g|jfif|webp|gif|bmp|tiff?|avif|hei[cf]|ico|jxl|tga|qoi|psd|jp2|dds|exr|hdr|ppm|pcx|dng|cr2)$/i",
+          "when": "!explorerResourceIsFolder && resourceScheme == file && (!remold.ready || resourceExtname in remold.supported)",
           "group": "7_modification@9"
         }
       ],
       "editor/title": [
         {
           "command": "remold.convertTo",
-          "when": "activeCustomEditorId == imagePreview.previewEditor && resourceScheme == file && resourceExtname =~ /^\\.(png|jpe?g|jfif|webp|gif|bmp|tiff?|avif|hei[cf]|ico|jxl|tga|qoi|psd|jp2|dds|exr|hdr|ppm|pcx|dng|cr2)$/i",
+          "when": "activeCustomEditorId == imagePreview.previewEditor && resourceScheme == file",
           "group": "navigation"
         }
       ],
       "remold.convertSubmenu": [
         {
           "command": "remold.to.png",
-          "when": "resourceExtname =~ /^(?!\\.png$)/i",
-          "group": "1_common@0"
+          "when": "resourceExtname in remold.quick.png",
+          "group": "1_quick@0"
         },
         {
           "command": "remold.to.jpg",
-          "when": "resourceExtname =~ /^(?!\\.(jpe?g|jfif)$)/i",
-          "group": "1_common@1"
+          "when": "resourceExtname in remold.quick.jpg",
+          "group": "1_quick@1"
         },
         {
           "command": "remold.to.webp",
-          "when": "resourceExtname =~ /^(?!\\.webp$)/i",
-          "group": "1_common@2"
+          "when": "resourceExtname in remold.quick.webp",
+          "group": "1_quick@2"
         },
         {
           "command": "remold.to.avif",
-          "when": "resourceExtname =~ /^(?!\\.avif$)/i",
-          "group": "1_common@3"
+          "when": "resourceExtname in remold.quick.avif",
+          "group": "1_quick@3"
         },
         {
           "command": "remold.to.gif",
-          "when": "resourceExtname =~ /^(?!\\.gif$)/i",
-          "group": "1_common@4"
+          "when": "resourceExtname in remold.quick.gif",
+          "group": "1_quick@4"
         },
         {
           "command": "remold.to.ico",
-          "when": "resourceExtname =~ /^(?!\\.ico$)/i",
-          "group": "1_common@5"
+          "when": "resourceExtname in remold.quick.ico",
+          "group": "1_quick@5"
+        },
+        {
+          "command": "remold.to.pdf",
+          "when": "resourceExtname in remold.quick.pdf",
+          "group": "1_quick@6"
+        },
+        {
+          "command": "remold.to.svg",
+          "when": "resourceExtname in remold.quick.svg",
+          "group": "1_quick@7"
+        },
+        {
+          "command": "remold.to.docx",
+          "when": "resourceExtname in remold.quick.docx",
+          "group": "1_quick@8"
+        },
+        {
+          "command": "remold.to.txt",
+          "when": "resourceExtname in remold.quick.txt",
+          "group": "1_quick@9"
+        },
+        {
+          "command": "remold.to.odt",
+          "when": "resourceExtname in remold.quick.odt",
+          "group": "1_quick@10"
+        },
+        {
+          "command": "remold.to.md",
+          "when": "resourceExtname in remold.quick.md",
+          "group": "1_quick@11"
+        },
+        {
+          "command": "remold.to.html",
+          "when": "resourceExtname in remold.quick.html",
+          "group": "1_quick@12"
+        },
+        {
+          "command": "remold.to.xlsx",
+          "when": "resourceExtname in remold.quick.xlsx",
+          "group": "1_quick@13"
+        },
+        {
+          "command": "remold.to.csv",
+          "when": "resourceExtname in remold.quick.csv",
+          "group": "1_quick@14"
+        },
+        {
+          "command": "remold.to.ods",
+          "when": "resourceExtname in remold.quick.ods",
+          "group": "1_quick@15"
+        },
+        {
+          "command": "remold.to.pptx",
+          "when": "resourceExtname in remold.quick.pptx",
+          "group": "1_quick@16"
+        },
+        {
+          "command": "remold.to.json",
+          "when": "resourceExtname in remold.quick.json",
+          "group": "1_quick@17"
+        },
+        {
+          "command": "remold.to.yaml",
+          "when": "resourceExtname in remold.quick.yaml",
+          "group": "1_quick@18"
+        },
+        {
+          "command": "remold.to.xml",
+          "when": "resourceExtname in remold.quick.xml",
+          "group": "1_quick@19"
+        },
+        {
+          "command": "remold.to.epub",
+          "when": "resourceExtname in remold.quick.epub",
+          "group": "1_quick@20"
+        },
+        {
+          "command": "remold.to.mobi",
+          "when": "resourceExtname in remold.quick.mobi",
+          "group": "1_quick@21"
+        },
+        {
+          "command": "remold.to.azw3",
+          "when": "resourceExtname in remold.quick.azw3",
+          "group": "1_quick@22"
+        },
+        {
+          "command": "remold.to.mp4",
+          "when": "resourceExtname in remold.quick.mp4",
+          "group": "1_quick@23"
+        },
+        {
+          "command": "remold.to.webm",
+          "when": "resourceExtname in remold.quick.webm",
+          "group": "1_quick@24"
+        },
+        {
+          "command": "remold.to.mp3",
+          "when": "resourceExtname in remold.quick.mp3",
+          "group": "1_quick@25"
+        },
+        {
+          "command": "remold.to.wav",
+          "when": "resourceExtname in remold.quick.wav",
+          "group": "1_quick@26"
+        },
+        {
+          "command": "remold.to.flac",
+          "when": "resourceExtname in remold.quick.flac",
+          "group": "1_quick@27"
+        },
+        {
+          "command": "remold.to.m4a",
+          "when": "resourceExtname in remold.quick.m4a",
+          "group": "1_quick@28"
+        },
+        {
+          "command": "remold.to.ogg",
+          "when": "resourceExtname in remold.quick.ogg",
+          "group": "1_quick@29"
+        },
+        {
+          "command": "remold.to.zip",
+          "when": "resourceExtname in remold.quick.zip",
+          "group": "1_quick@30"
+        },
+        {
+          "command": "remold.to.7z",
+          "when": "resourceExtname in remold.quick.7z",
+          "group": "1_quick@31"
+        },
+        {
+          "command": "remold.to.folder",
+          "when": "resourceExtname in remold.quick.folder",
+          "group": "1_quick@32"
+        },
+        {
+          "command": "remold.to.dxf",
+          "when": "resourceExtname in remold.quick.dxf",
+          "group": "1_quick@33"
+        },
+        {
+          "command": "remold.to.ttf",
+          "when": "resourceExtname in remold.quick.ttf",
+          "group": "1_quick@34"
+        },
+        {
+          "command": "remold.to.otf",
+          "when": "resourceExtname in remold.quick.otf",
+          "group": "1_quick@35"
+        },
+        {
+          "command": "remold.to.woff2",
+          "when": "resourceExtname in remold.quick.woff2",
+          "group": "1_quick@36"
+        },
+        {
+          "command": "remold.to.srt",
+          "when": "resourceExtname in remold.quick.srt",
+          "group": "1_quick@37"
+        },
+        {
+          "command": "remold.to.vtt",
+          "when": "resourceExtname in remold.quick.vtt",
+          "group": "1_quick@38"
+        },
+        {
+          "command": "remold.to.ass",
+          "when": "resourceExtname in remold.quick.ass",
+          "group": "1_quick@39"
+        },
+        {
+          "command": "remold.to.geojson",
+          "when": "resourceExtname in remold.quick.geojson",
+          "group": "1_quick@40"
+        },
+        {
+          "command": "remold.to.gpx",
+          "when": "resourceExtname in remold.quick.gpx",
+          "group": "1_quick@41"
+        },
+        {
+          "command": "remold.to.kml",
+          "when": "resourceExtname in remold.quick.kml",
+          "group": "1_quick@42"
+        },
+        {
+          "command": "remold.to.glb",
+          "when": "resourceExtname in remold.quick.glb",
+          "group": "1_quick@43"
+        },
+        {
+          "command": "remold.to.stl",
+          "when": "resourceExtname in remold.quick.stl",
+          "group": "1_quick@44"
+        },
+        {
+          "command": "remold.to.obj",
+          "when": "resourceExtname in remold.quick.obj",
+          "group": "1_quick@45"
         },
         {
           "command": "remold.moreFormats",
@@ -156,6 +568,166 @@
           "when": "false"
         },
         {
+          "command": "remold.to.pdf",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.svg",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.docx",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.txt",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.odt",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.md",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.html",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.xlsx",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.csv",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.ods",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.pptx",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.json",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.yaml",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.xml",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.epub",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.mobi",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.azw3",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.mp4",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.webm",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.mp3",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.wav",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.flac",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.m4a",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.ogg",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.zip",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.7z",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.folder",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.dxf",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.ttf",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.otf",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.woff2",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.srt",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.vtt",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.ass",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.geojson",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.gpx",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.kml",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.glb",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.stl",
+          "when": "false"
+        },
+        {
+          "command": "remold.to.obj",
+          "when": "false"
+        },
+        {
           "command": "remold.moreFormats",
           "when": "false"
         }
@@ -164,12 +736,34 @@
     "configuration": {
       "title": "Remold",
       "properties": {
+        "remold.fileeSource": {
+          "type": "string",
+          "default": "auto",
+          "scope": "machine",
+          "enum": [
+            "auto",
+            "managed",
+            "installed"
+          ],
+          "enumDescriptions": [
+            "Use your installed Filee (2.5 or later) if there is one; otherwise Remold downloads its own copy and keeps it up to date.",
+            "Always use Remold's own copy of Filee (downloaded once, about 140 MB, updated automatically).",
+            "Only use Filee you installed yourself; Remold downloads nothing."
+          ],
+          "markdownDescription": "Which Filee converts the files. `remold.fileePath` overrides this."
+        },
+        "remold.fileePath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "markdownDescription": "Path to a Filee command-line program to use instead (`filee`, or `filee-cli.exe` on Windows). Empty: see `remold.fileeSource`."
+        },
         "remold.quality": {
           "type": "integer",
           "default": 85,
           "minimum": 1,
           "maximum": 100,
-          "description": "Quality (1–100) for lossy formats: JPG, WEBP, AVIF, JPEG XL and JPEG 2000."
+          "description": "Quality (1–100) for lossy image formats (JPG, WEBP, AVIF, …), passed to Filee."
         },
         "remold.outputFolder": {
           "type": "string",
@@ -179,20 +773,12 @@
         "remold.estimateSizes": {
           "type": "boolean",
           "default": true,
-          "description": "Show the size each format would have in the format picker. Measuring converts the image once per format in the background."
+          "description": "Show the size each suggested format would have in the \"More Formats…\" picker (images and vector graphics up to 25 MB). Measuring converts the file once per format in the background."
         },
         "remold.insertFormat": {
           "type": "string",
           "default": "webp",
-          "enum": [
-            "png",
-            "jpg",
-            "webp",
-            "avif",
-            "gif",
-            "jxl"
-          ],
-          "markdownDescription": "Format used by **Insert as … (Remold)** when dropping or pasting images into Markdown or HTML."
+          "markdownDescription": "Filee format id used by **Insert as … (Remold)** when dropping or pasting images into Markdown or HTML, for example `webp`, `avif`, `png` or `jpg`."
         },
         "remold.referenceFiles": {
           "type": "string",
@@ -215,12 +801,11 @@
     "test": "node esbuild.mjs && node esbuild.mjs --tests && node --test \"out-test/*.test.js\"",
     "package": "node esbuild.mjs --production && vsce package --no-dependencies",
     "vscode:prepublish": "node esbuild.mjs --production",
-    "test:integration": "node esbuild.mjs && node esbuild.mjs --tests && node out-test/integration/run.js"
-  },
-  "dependencies": {
-    "@imagemagick/magick-wasm": "^0.0.46"
+    "test:integration": "node esbuild.mjs && node esbuild.mjs --tests && node out-test/integration/run.js",
+    "parity": "esbuild scripts/verify-parity.ts --bundle --platform=node --format=cjs --outfile=out-test/verify-parity.js --log-level=warning && node out-test/verify-parity.js"
   },
   "devDependencies": {
+    "@imagemagick/magick-wasm": "^0.0.46",
     "@types/node": "^26.6.6",
     "@types/vscode": "1.97.0",
     "@vscode/test-electron": "^3.1.0",
@@ -228,5 +813,8 @@
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2"
   },
-  "icon": "media/icon.png"
+  "icon": "media/icon.png",
+  "activationEvents": [
+    "onStartupFinished"
+  ]
 }

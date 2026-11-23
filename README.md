@@ -1,66 +1,80 @@
 # Remold
 
-Convert images without leaving VS Code. Right-click an image → **Convert to ▸ WEBP** and the new file appears,
-selected, next to the original. Everything runs on your computer with ImageMagick compiled to WebAssembly: nothing is
-uploaded and nothing else needs to be installed.
+Convert files without leaving VS Code: right-click → **Convert to ▸ PDF**, **WEBP**, **MP3**, **Extract to
+Folder**… Remold is the VS Code front end of [Filee](https://filee.sh), the offline file converter: everything
+Filee converts (images, PDF, Word/Excel/PowerPoint and OpenDocument files, HWP, e-books, video, audio, archives,
+subtitles, data, maps, fonts, CAD drawings, 3D models — 300+ formats), Remold converts. Files never leave your
+computer.
 
-## Formats
+## Setup
 
-- **Reads:** PNG, JPG/JPEG/JFIF, WEBP, GIF, BMP, TIFF, AVIF, HEIC/HEIF, ICO, JPEG XL, TGA, QOI, PSD, JPEG 2000, DDS,
-  OpenEXR, Radiance HDR, PPM, PCX, and camera RAW (DNG, CR2).
-- **Writes:** PNG, JPG, WEBP, AVIF, GIF, JPEG XL, TIFF, BMP, ICO, QOI, TGA, JPEG 2000.
+Nothing to install by hand. On first start Remold uses your own [Filee](https://filee.sh) if you have 2.5 or later;
+otherwise it downloads Filee's official package for your computer from
+[Filee's releases](https://github.com/KnifeLemon/Filee/releases) (about 140 MB, once, with a progress notification)
+into VS Code's storage for Remold. Only Filee's command line is used — no Filee window, icon or menu entries — and
+its settings and engines stay in Remold's folder.
 
-Animated GIFs stay animated when converted to WEBP or GIF, and multi-page files keep their pages in TIFF; other
-formats get the first frame. Transparent areas become white in JPG. Images larger than 256 px are scaled down for ICO.
+Every download is checked before it's used: Filee signs each release's checksum file with its update key (the same
+check Filee's own updater does), and the package must match that checksum and run as the version it claims to be.
+
+**Updates.** Once a day Remold looks for a newer Filee 2.x and updates its copy in the background; the old copy
+stays in use if anything goes wrong. New formats Filee adds appear in Remold by themselves — no Remold update
+needed. A Filee 3.0 is only used once a Remold version supports it. **Remold: Check for Filee Updates** checks now.
+If you use your own Filee, update it from Filee's menu.
+
+Optional Filee engines (Calibre, Tesseract, …) are installed with Filee: `filee engines`. On Linux, Word/Excel/
+PowerPoint conversions need LibreOffice from your distribution.
 
 ## Use
 
-- **Convert to ▸** — right-click one or more images in the Explorer (or an image's editor tab) → **Convert to** →
-  PNG, JPG, WEBP, AVIF, GIF or ICO. The image's own format isn't listed. The converted file is selected in the
-  Explorer and a message shows the result, for example `cat.png → cat.webp · 38 KB (−72%)`.
-- **More Formats…** — the last item of the submenu, the **Convert Image…** button in the title bar of VS Code's
-  image preview, and **Remold: Convert Image…** in the Command Palette open a picker with every format. For one
-  image it measures each format first and shows the size it would have (`38 KB · −72% · smallest`).
+- **Convert to ▸** — right-click one or more files in the Explorer (or a file's editor tab) → **Convert to**. The
+  submenu lists the common targets for that kind of file: PNG, JPG, WEBP… for images, PDF, DOCX, ODT… for
+  documents, MP4, WEBM, GIF, MP3 for video, **Extract to Folder**, ZIP, 7Z for archives, and so on. The new file is
+  selected in the Explorer and a message shows the result, for example `cat.png → cat.webp · 38 KB (−72%)`.
+- **More Formats…** — the last item of the submenu (also **Remold: Convert File…** in the Command Palette and a
+  button on VS Code's image preview) lists every format Filee can convert the file to, grouped by kind. For one
+  image it measures the suggested formats first and shows their sizes (`38 KB · −72% · smallest`).
 - **Update References** — after converting, Remold looks for HTML, CSS, Markdown, JavaScript/TypeScript, Vue,
   Svelte and Astro files that refer to the old file (relative paths, `/root/paths`, `@/` and `~/` aliases) and
   offers to update them. Every change is shown in VS Code's Refactor Preview to check before it's applied.
-- **Insert as WebP** — drop (with <kbd>Shift</kbd>) or paste an image into a Markdown or HTML file, then pick
-  **Insert as WEBP (Remold)** from the drop/paste menu that appears: the image is converted and a link to the
-  converted file is inserted. Works for images from the Explorer, your file manager and the clipboard (screenshots
-  are saved next to the document). The format is set by `remold.insertFormat`.
+- **Insert as WEBP** — drop (with <kbd>Shift</kbd>) or paste an image into a Markdown or HTML file and pick
+  **Insert as WEBP (Remold)** from the drop/paste menu: the image is converted and a link to the converted file is
+  inserted. Works for images from the Explorer, your file manager and the clipboard (screenshots are saved next to
+  the document). The format is set by `remold.insertFormat`.
 
-Existing files are never replaced: converting `cat.png` again gives `cat (1).webp`. One image converts with a
-spinner in the status bar; several show a progress notification you can cancel. Conversions run in a background
-thread, so VS Code stays responsive. Details are in the **Remold** output channel.
+Existing files are never replaced: Filee adds a number instead (`cat (2).webp`). One file converts with a spinner in
+the status bar; several show a progress notification you can cancel. Details are in the **Remold** output channel.
+**Remold: Reload Filee Formats** re-reads Filee after installing an engine.
 
 ## Settings
 
 | Setting | Default | What it does |
 |---|---|---|
-| `remold.quality` | `85` | Quality (1–100) for JPG, WEBP, AVIF, JPEG XL and JPEG 2000. |
+| `remold.fileeSource` | `auto` | `auto`: your Filee 2.5+ if installed, otherwise Remold's own copy. `managed`: always Remold's copy. `installed`: only yours; Remold downloads nothing. |
+| `remold.fileePath` | `""` | A Filee command-line program to use instead (overrides `remold.fileeSource`). |
+| `remold.quality` | `85` | Quality (1–100) for lossy image formats, passed to Filee. |
 | `remold.outputFolder` | `""` | Folder for converted files, relative to each source file (e.g. `converted`) or absolute. Empty means next to the source. |
-| `remold.estimateSizes` | `true` | Measure each format's size in the picker (one image up to 25 MB). |
-| `remold.insertFormat` | `webp` | Format used by **Insert as … (Remold)** when dropping or pasting. |
+| `remold.estimateSizes` | `true` | Measure the suggested formats' sizes in **More Formats…** (images and vector graphics up to 25 MB). |
+| `remold.insertFormat` | `webp` | Filee format used by **Insert as … (Remold)** when dropping or pasting. |
 | `remold.referenceFiles` | `**/*.{html,…,astro}` | Files searched by **Update References**; empty turns it off. |
-
-## Limits
-
-WebAssembly is slower than native ImageMagick (roughly 2–5×) and can use at most 4 GB of memory, so very large images
-can fail. Only files on disk are supported, which includes Remote SSH, WSL and Dev Containers, where Remold runs on
-the remote machine.
 
 ## Development
 
 ```bash
 npm install
-npm test          # builds dist/, then runs the unit tests in test/ against it
-npm run test:integration   # runs Remold inside a downloaded VS Code (Linux: prefix with xvfb-run -a)
+npm test                    # unit tests (a fake Filee stands in for the real one)
 npm run typecheck
-npm run package   # builds remold-<version>.vsix
+REMOLD_FILEE=/path/to/filee xvfb-run -a npm run test:integration   # in a downloaded VS Code, with real Filee
+REMOLD_FILEE=managed xvfb-run -a npm run test:integration          # …with Remold downloading Filee itself
+npm run parity -- --filee /path/to/filee   # converts a sample of every format to every target through Remold;
+                                           # results in .parity/CHECKLIST.md (not committed)
+npm run package             # builds remold-<version>.vsix
+node scripts/sync-menus.mjs # after changing the quick targets in src/filee/quick.ts
 ```
 
 Press <kbd>F5</kbd> in VS Code to start a development window with the extension loaded.
 
 ## License
 
-MIT. Bundled third-party software and its licenses: see `THIRD-PARTY-NOTICES.md`.
+MIT. Remold contains no third-party code; Filee is a separate program under its own MIT license. See
+`THIRD-PARTY-NOTICES.md`.

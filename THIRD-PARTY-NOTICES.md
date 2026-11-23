@@ -1,15 +1,15 @@
 # Third-party notices
 
-Remold is MIT-licensed (see `LICENSE`). It bundles the following software, each under its own license.
+Remold is MIT-licensed (see `LICENSE`) and contains no third-party code.
 
-| Component | License | Project |
-|---|---|---|
-| magick-wasm (`dist/magick.wasm` and the JavaScript bundled into `dist/`) | Apache-2.0 | https://github.com/dlemstra/magick-wasm |
-| ImageMagick, compiled into `magick.wasm` | ImageMagick License | https://imagemagick.org |
-| The image libraries compiled into `magick.wasm` (libpng, libjpeg-turbo, libwebp, libheif, libaom, libjxl, OpenJPEG, LibRaw, zlib and others) | Their own licenses | listed in magick-wasm's NOTICE |
+## Filee
 
-The build copies magick-wasm's license and NOTICE file into the extension, at `dist/licenses/magick-wasm-LICENSE.txt`
-and `dist/licenses/magick-wasm-NOTICE.txt`. The NOTICE file contains the full ImageMagick license and the license of
-every library compiled into `magick.wasm`.
+Remold converts files by running **Filee** (https://filee.sh, https://github.com/KnifeLemon/Filee), which users
+install separately. Filee is MIT-licensed, Copyright (c) 2026 Myeonggu Kim (KnifeLemon) and Filee contributors.
+Remold doesn't include, change or redistribute Filee or its engines. Remold is not made or endorsed by the Filee
+authors.
 
-ImageMagick is a trademark of ImageMagick Studio LLC. Remold is not made or endorsed by ImageMagick Studio LLC.
+## Development only
+
+`scripts/render-icon.mjs` renders the icon with magick-wasm (Apache-2.0, https://github.com/dlemstra/magick-wasm),
+which includes ImageMagick (ImageMagick License). It is a development dependency and is not part of the extension.
